@@ -67,16 +67,16 @@ max user processes 为os中用户可以创建最大的进程/线程个数
 通过命令：man *** 查看linux中systemcall函数
 
 | 代号        | 代表内容    |
-    | --------   | :-----   |
-    | 1        | User commands that may be started by everyone.      |
-    | 2        | System calls, that is, functions provided by the kernel.      |
-    | 3        | Subroutines, that is, library functions.      |
-    | 4        | Devices, that is, special files in the /dev directory.      |
-    | 5        | File format descriptions, e.g. /etc/passwd.      |
-    | 6        | Games, self-explanatory.      |
-    | 7        | Miscellaneous, e.g. macro packages, conventions.      |
-    | 8        | System administration tools that only root can execute.      |
-    | 9        | Another (Linux specific) place for kernel routine documentation.      |
+| --------   | :-----   |
+| 1        | User commands that may be started by everyone.      |
+| 2        | System calls, that is, functions provided by the kernel.      |
+| 3        | Subroutines, that is, library functions.      |
+| 4        | Devices, that is, special files in the /dev directory.      |
+| 5        | File format descriptions, e.g. /etc/passwd.      |
+| 6        | Games, self-explanatory.      |
+| 7        | Miscellaneous, e.g. macro packages, conventions.      |
+| 8        | System administration tools that only root can execute.      |
+| 9        | Another (Linux specific) place for kernel routine documentation.      |
 
 通过nc工具连接socket
 ```
@@ -91,17 +91,16 @@ max user processes 为os中用户可以创建最大的进程/线程个数
 客户端client生成一个随机46862与服务端5555连接
 
 | 状态    | 含义    |
-    | ----- | ----- |
-    | LISTENING | 侦听状态  |
-    | ESTABLISHED   | 建立连接，两台机器正在通信 |
-    | CLOSE_WAIT    | 对方主动关闭连接或者网络异常导致连接中断，这时我方的状态会变成CLOSE_WAIT 此时我方要调用close()来使得连接正确关闭 |
-    | TIME_WAIT     | 我方主动调用close()断开连接，收到对方确认后状态变为TIME_WAIT |
-    | SYN_SENT      | 请求连接 |
+| ----- | ----- |
+| LISTENING | 侦听状态  |
+| ESTABLISHED   | 建立连接，两台机器正在通信 |
+| CLOSE_WAIT    | 对方主动关闭连接或者网络异常导致连接中断，这时我方的状态会变成CLOSE_WAIT 此时我方要调用close()来使得连接正确关闭 |
+| TIME_WAIT     | 我方主动调用close()断开连接，收到对方确认后状态变为TIME_WAIT |
+| SYN_SENT      | 请求连接 |
 
 ##### 分析
 
 此模型为阻塞模型，只能有一个socket连入，会阻塞在接收客户端发送消息中，导致其他客户端无法再连入进来
-
 
 
 
