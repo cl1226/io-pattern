@@ -1,7 +1,6 @@
 ### IO模型
 ##### IO阻塞模型
 ```
-编写简单的socket服务端代码，在端口5555上绑定监听端口
 try {
     ServerSocket serverSocket = new ServerSocket(5555);
     System.out.println("socket bind on port: 5555");
@@ -18,7 +17,7 @@ try {
     e.printStackTrace();
 }
 ```
-> 执行：strace -ff -o ./io java -jar xxx.jar
+> 执行： __strace -ff -o ./io java -jar xxx.jar__
 ```
 安装：yum install strace
 strace命令用于跟踪进程执行时的系统调用和所接受的信号
@@ -32,18 +31,18 @@ strace命令用于跟踪进程执行时的系统调用和所接受的信号
 
 ![avatar][strace_2]
 
-调用了clone方法，clone出了23351线程，"clone"为系统调用，查看io.23351文件
+调用了 __clone__ 方法，clone出了23351线程，"clone"为系统调用，查看io.23351文件
 
 > socket(AF_INET6, SOCK_STREAM, IPPROTO_IP) = 6
 
 ![avatar][strace_3]
 
-1. 通过socket创建了文件描述符6: socket() = 6
-2. 绑定5555到文件描述符6上: bind(6, 5555)
-3. 监听文件描述符6: listen(6)
-4. poll(fd 6) 阻塞住线程
+>1. 通过socket创建了文件描述符6: socket() = 6
+>2. 绑定5555到文件描述符6上: bind(6, 5555)
+>3. 监听文件描述符6: listen(6)
+>4. poll(fd 6) 阻塞住线程
 
-查看linux中 /proc/23350/fd目录
+查看linux中 __/proc/23350/fd__ 目录
 
 ![avatar][starce_4]
 
@@ -54,9 +53,9 @@ strace命令用于跟踪进程执行时的系统调用和所接受的信号
 3、4 java程序打开的文件
 5、6 socket绑定的文件，ipv4、ipv6
 ```
-查看linux中 /proc/23350/task目录：为该jvm进程产生的所有线程
+查看linux中 __/proc/23350/task__ 目录：为该jvm进程产生的所有线程
 
-通过ulimit -a 命令查看
+通过 __ulimit -a__ 命令查看
 
 ![avatar][strace_5]
 ```
@@ -64,7 +63,7 @@ open files  为os中每个进程打开的最大文件个数
 max user processes 为os中用户可以创建最大的进程/线程个数
 ```
 
-通过命令：man *** 查看linux中systemcall函数
+通过命令： __man ***__  查看linux中systemcall函数
 
 | 代号        | 代表内容    |
     | --------   | :-----   |
@@ -83,11 +82,10 @@ max user processes 为os中用户可以创建最大的进程/线程个数
 安装： yum install nc
 使用： nc localhost 5555
 ```
-查看/proc/23350/fd目录，增加了一个7文件描述符
+查看 __/proc/23350/fd__ 目录，增加了一个7文件描述符
 
-通过命令netstat -natp查看网络连接
+通过命令 __netstat -natp__ 查看网络连接
 > tcp6       0      0 ::1:5555                ::1:46862               ESTABLISHED 23350/java
-
 客户端client生成一个随机46862与服务端5555连接
 
 | 状态    | 含义    |
@@ -98,11 +96,56 @@ max user processes 为os中用户可以创建最大的进程/线程个数
     | TIME_WAIT     | 我方主动调用close()断开连接，收到对方确认后状态变为TIME_WAIT |
     | SYN_SENT      | 请求连接 |
 
-##### 分析
+##### 问题分析
 
-此模型为阻塞模型，只能有一个socket连入，会阻塞在接收客户端发送消息中，导致其他客户端无法再连入进来
+> 此模型为阻塞模型，只能有一个socket连入，会阻塞在接收客户端发送消息中，导致其他客户端无法再连入进来
 
 
+--------------------------------------------
+解决上面的问题
+
+看代码中的NonBIODemo类，将读取数据的内容抛出一个子线程里去执行
+```
+try {
+    ServerSocket serverSocket = new ServerSocket(6666);
+    System.out.println("socket bind on port: 6666");
+
+    while (true) {
+        final Socket socket = serverSocket.accept();
+        System.out.println("accept socket: " + socket.toString());
+        new Thread() {
+            @Override
+            public void run() {
+                InputStream inputStream = null;
+                try {
+                    inputStream = socket.getInputStream();
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                    System.out.println("accept message from socket: " + socket.toString() + " " + bufferedReader.readLine());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+} catch (IOException e) {
+    e.printStackTrace();
+}
+```
+这样解决了由于需要等待接收已连入的client发送消息而阻塞住主线程，其他client无法连入的问题。
+
+##### 问题分析
+
+>server端每次为了读取client端的消息需要进行线程的切换，线程切换需要保留当前线程的运行状态，
+频繁切换占用CPU资源，有可能只有最后一个client发送了消息，这样对server端的性能损耗很大
+
+--------------------------------------------
+
+解决上面的问题
+
+>引入 __NIO__ 非阻塞IO, NIO有两个含义，一个是java中表示NewIO，另一个是OS中的非阻塞IO，
+>OS提供了三个系统调用： __select__、__poll__、__epoll__
+
+# TODO
 
 
 
