@@ -145,7 +145,8 @@ try {
 >引入 __NIO__ 非阻塞IO, NIO有两个含义，一个是java中表示NewIO，另一个是OS中的非阻塞IO，
 >OS提供了三个系统调用： __select__、__poll__、__epoll__
 
-# TODO
+##### 发展
+![image](https://github.com/cnnc/file-server/blob/master/io/io.png)
 
 
 
