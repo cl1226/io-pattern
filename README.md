@@ -25,17 +25,17 @@ strace命令用于跟踪进程执行时的系统调用和所接受的信号
 -ff -o 将所有进程的跟踪结果输出到相应的文件.pid中，pid为各进程的进程号
 ``` 
 
-![image](https://github.com/cnnc/file-server/blob/master/io/starce_1.png)
+![image](https://github.com/cnnc/io-pattern/blob/master/images/strace_1.png)
 
 从图中可以看出主进程是23350，对应io.23350文件，查看io.23350文件，在最后出现一行：
 
-![image](https://github.com/cnnc/file-server/blob/master/io/strace_2.png)
+![image](https://github.com/cnnc/io-pattern/blob/master/images/strace_2.png)
 
 调用了 __clone__ 方法，clone出了23351线程，"clone"为系统调用，查看io.23351文件
 
 > socket(AF_INET6, SOCK_STREAM, IPPROTO_IP) = 6
 
-![image](https://github.com/cnnc/file-server/blob/master/io/strace_3.png)
+![image](https://github.com/cnnc/io-pattern/blob/master/images/strace_3.png)
 
 >1. 通过socket创建了文件描述符6: socket() = 6
 >2. 绑定5555到文件描述符6上: bind(6, 5555)
@@ -44,7 +44,7 @@ strace命令用于跟踪进程执行时的系统调用和所接受的信号
 
 查看linux中 __/proc/23350/fd__ 目录
 
-![image](https://github.com/cnnc/file-server/blob/master/io/strace_4.png)
+![image](https://github.com/cnnc/io-pattern/blob/master/images/strace_4.png)
 
 ```
 0   标准输入流
@@ -57,7 +57,7 @@ strace命令用于跟踪进程执行时的系统调用和所接受的信号
 
 通过 __ulimit -a__ 命令查看
 
-![image](https://github.com/cnnc/file-server/blob/master/io/strace_5.png)
+![image](https://github.com/cnnc/io-pattern/blob/master/images/strace_5.png)
 ```
 open files  为os中每个进程打开的最大文件个数
 max user processes 为os中用户可以创建最大的进程/线程个数
@@ -146,7 +146,7 @@ try {
 >OS提供了三个系统调用： __select__、__poll__、__epoll__
 
 ##### 发展
-![image](https://github.com/cnnc/file-server/blob/master/io/io.png)
+![image](https://github.com/cnnc/io-pattern/blob/master/images/io.png)
 
 
 
